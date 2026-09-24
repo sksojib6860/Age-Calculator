@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:age_calculator/core/constants/app_dimensions.dart';
-import 'package:age_calculator/core/constants/app_text_styles.dart';
+import 'package:age_calculator/core/localization/app_localizations.dart';
+import 'package:age_calculator/core/localization/locale_provider.dart';
 import 'package:age_calculator/core/theme/theme_provider.dart';
 import 'package:age_calculator/core/widgets/custom_date_picker_field.dart';
 import 'package:age_calculator/core/widgets/glass_card.dart';
@@ -25,6 +26,8 @@ class DashboardScreen extends StatelessWidget {
     final themeProvider = context.watch<ThemeProvider>();
     final monthColor = themeProvider.currentMonthColor;
     final isDark = themeProvider.isDarkMode;
+    final localeProvider = context.watch<LocaleProvider?>();
+    final l10n = AppLocalizations.of(context);
 
     final ageResult = viewModel.ageResult;
     final milestones = viewModel.milestones;
@@ -68,8 +71,8 @@ class DashboardScreen extends StatelessWidget {
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            'Age Calculator',
+                          Text(
+                            l10n.text('appTitle'),
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.w800,
@@ -79,7 +82,10 @@ class DashboardScreen extends StatelessWidget {
                           Row(
                             children: [
                               Text(
-                                '${monthColor.monthName} Accent',
+                                l10n.monthAccent(
+                                  monthColor.monthName,
+                                  monthColor.season,
+                                ),
                                 style: TextStyle(
                                   fontSize: 11,
                                   color: monthColor.primary,
@@ -87,13 +93,6 @@ class DashboardScreen extends StatelessWidget {
                                 ),
                               ),
                               const SizedBox(width: 4),
-                              Text(
-                                '• ${monthColor.season}',
-                                style: TextStyle(
-                                  fontSize: 11,
-                                  color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
-                                ),
-                              ),
                             ],
                           ),
                         ],
@@ -101,22 +100,48 @@ class DashboardScreen extends StatelessWidget {
                     ],
                   ),
 
-                  // Dark/Light Mode Switch with micro-fade transition
-                  AnimatedSwitcher(
-                    duration: const Duration(milliseconds: 350),
-                    transitionBuilder: (child, anim) => FadeTransition(
-                      opacity: anim,
-                      child: RotationTransition(turns: anim, child: child),
-                    ),
-                    child: IconButton(
-                      key: ValueKey(isDark),
-                      icon: Icon(
-                        isDark ? Icons.light_mode_rounded : Icons.dark_mode_rounded,
-                        color: monthColor.primary,
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      PopupMenuButton<Locale>(
+                        tooltip: l10n.text('language'),
+                        icon: Icon(
+                          Icons.language_rounded,
+                          color: monthColor.primary,
+                        ),
+                        onSelected: localeProvider?.setLocale,
+                        itemBuilder: (context) => [
+                          PopupMenuItem(
+                            value: const Locale('en'),
+                            child: Text(l10n.text('english')),
+                          ),
+                          PopupMenuItem(
+                            value: const Locale('bn'),
+                            child: Text(l10n.text('bangla')),
+                          ),
+                        ],
                       ),
-                      onPressed: () => themeProvider.toggleTheme(),
-                      tooltip: isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode',
-                    ),
+                      AnimatedSwitcher(
+                        duration: const Duration(milliseconds: 350),
+                        transitionBuilder: (child, anim) => FadeTransition(
+                          opacity: anim,
+                          child: RotationTransition(turns: anim, child: child),
+                        ),
+                        child: IconButton(
+                          key: ValueKey(isDark),
+                          icon: Icon(
+                            isDark
+                                ? Icons.light_mode_rounded
+                                : Icons.dark_mode_rounded,
+                            color: monthColor.primary,
+                          ),
+                          onPressed: () => themeProvider.toggleTheme(),
+                          tooltip: isDark
+                              ? l10n.text('switchLight')
+                              : l10n.text('switchDark'),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -127,19 +152,28 @@ class DashboardScreen extends StatelessWidget {
             if (viewModel.selectedProfileName != null) ...[
               Container(
                 margin: const EdgeInsets.only(bottom: 12),
-                padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 14,
+                  vertical: 8,
+                ),
                 decoration: BoxDecoration(
                   color: monthColor.primary.withOpacity(0.18),
                   borderRadius: BorderRadius.circular(14),
-                  border: Border.all(color: monthColor.primary.withOpacity(0.35)),
+                  border: Border.all(
+                    color: monthColor.primary.withOpacity(0.35),
+                  ),
                 ),
                 child: Row(
                   children: [
-                    Icon(Icons.person_pin_circle_rounded, color: monthColor.primary, size: 20),
+                    Icon(
+                      Icons.person_pin_circle_rounded,
+                      color: monthColor.primary,
+                      size: 20,
+                    ),
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        'Viewing Profile: ${viewModel.selectedProfileName}',
+                        l10n.viewingProfile(viewModel.selectedProfileName!),
                         style: TextStyle(
                           color: monthColor.primary,
                           fontWeight: FontWeight.bold,
@@ -160,8 +194,8 @@ class DashboardScreen extends StatelessWidget {
             CustomDatePickerField(
               selectedDate: viewModel.dob,
               onDateChanged: (newDob) => viewModel.setDob(newDob),
-              label: 'DATE OF BIRTH',
-              subtitle: 'Tap to select or change date',
+              label: l10n.text('dateOfBirth'),
+              subtitle: l10n.text('tapToSelect'),
               monthColor: monthColor,
               lastDate: DateTime.now(),
             ),
@@ -192,9 +226,13 @@ class DashboardScreen extends StatelessWidget {
                       borderRadius: BorderRadius.circular(18),
                     ),
                   ),
-                  icon: const Icon(Icons.flash_on_rounded, color: Colors.white, size: 22),
-                  label: const Text(
-                    'Calculate Age',
+                  icon: const Icon(
+                    Icons.flash_on_rounded,
+                    color: Colors.white,
+                    size: 22,
+                  ),
+                  label: Text(
+                    l10n.text('calculateAge'),
                     style: TextStyle(
                       color: Colors.white,
                       fontSize: 16,
@@ -243,10 +281,7 @@ class DashboardScreen extends StatelessWidget {
 
               // Life Milestones Infographics (Heartbeats, Breaths, Sleep, Zodiacs)
               if (milestones != null) ...[
-                MilestonesCard(
-                  milestones: milestones,
-                  monthColor: monthColor,
-                ),
+                MilestonesCard(milestones: milestones, monthColor: monthColor),
               ],
             ],
 

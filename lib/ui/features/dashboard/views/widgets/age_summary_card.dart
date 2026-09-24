@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:age_calculator/core/constants/app_colors.dart';
 import 'package:age_calculator/core/constants/app_dimensions.dart';
 import 'package:age_calculator/core/constants/app_text_styles.dart';
+import 'package:age_calculator/core/localization/app_localizations.dart';
 import 'package:age_calculator/core/widgets/animated_counter.dart';
 import 'package:age_calculator/core/widgets/glass_card.dart';
 import 'package:age_calculator/domain/entities/age_result.dart';
@@ -23,7 +24,8 @@ class AgeSummaryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final numberFormatter = NumberFormat('#,###');
+    final l10n = AppLocalizations.of(context);
+    final numberFormatter = NumberFormat('#,###', l10n.locale.toLanguageTag());
 
     return GlassCard(
       padding: const EdgeInsets.all(AppDimensions.paddingLarge),
@@ -49,7 +51,7 @@ class AgeSummaryCard extends StatelessWidget {
                   ),
                   const SizedBox(width: 10),
                   Text(
-                    'Exact Age',
+                    l10n.text('exactAge'),
                     style: AppTextStyles.titleLarge.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
@@ -66,7 +68,7 @@ class AgeSummaryCard extends StatelessWidget {
                   ),
                 ),
                 child: Text(
-                  'Born on ${ageResult.bornDayOfWeek}',
+                  l10n.bornOn(ageResult.bornDayOfWeek),
                   style: AppTextStyles.bodySmall.copyWith(
                     color: monthColor.primary,
                     fontWeight: FontWeight.w600,
@@ -83,7 +85,7 @@ class AgeSummaryCard extends StatelessWidget {
               Expanded(
                 child: _buildUnitTile(
                   context,
-                  label: 'YEARS',
+                  label: l10n.text('years').toUpperCase(),
                   value: ageResult.years,
                   highlight: true,
                 ),
@@ -92,7 +94,7 @@ class AgeSummaryCard extends StatelessWidget {
               Expanded(
                 child: _buildUnitTile(
                   context,
-                  label: 'MONTHS',
+                  label: l10n.text('months').toUpperCase(),
                   value: ageResult.months,
                 ),
               ),
@@ -100,7 +102,7 @@ class AgeSummaryCard extends StatelessWidget {
               Expanded(
                 child: _buildUnitTile(
                   context,
-                  label: 'DAYS',
+                  label: l10n.text('days').toUpperCase(),
                   value: ageResult.days,
                 ),
               ),
@@ -113,7 +115,7 @@ class AgeSummaryCard extends StatelessWidget {
 
           // Secondary Micro-time Breakdown
           Text(
-            'LIFETIME BREAKDOWN',
+            l10n.text('lifetimeBreakdown'),
             style: AppTextStyles.labelCaps.copyWith(
               color: Colors.grey.shade400,
             ),
@@ -126,31 +128,31 @@ class AgeSummaryCard extends StatelessWidget {
               _buildMicroBadge(
                 context,
                 icon: Icons.calendar_view_month,
-                label: 'Months',
+                label: l10n.text('months'),
                 value: numberFormatter.format(ageResult.totalMonths),
               ),
               _buildMicroBadge(
                 context,
                 icon: Icons.date_range,
-                label: 'Weeks',
+                label: l10n.text('weeks'),
                 value: numberFormatter.format(ageResult.totalWeeks),
               ),
               _buildMicroBadge(
                 context,
                 icon: Icons.today,
-                label: 'Days',
+                label: l10n.text('days'),
                 value: numberFormatter.format(ageResult.totalDays),
               ),
               _buildMicroBadge(
                 context,
                 icon: Icons.access_time,
-                label: 'Hours',
+                label: l10n.text('hours'),
                 value: numberFormatter.format(ageResult.totalHours),
               ),
               _buildMicroBadge(
                 context,
                 icon: Icons.timer_outlined,
-                label: 'Minutes',
+                label: l10n.text('minutes'),
                 value: numberFormatter.format(ageResult.totalMinutes),
               ),
             ],

@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:intl/date_symbol_data_local.dart';
 import 'package:provider/provider.dart';
 
+import 'core/localization/app_localizations.dart';
+import 'core/localization/locale_provider.dart';
 import 'core/services/notification_service.dart';
 import 'core/theme/app_theme.dart';
 import 'core/theme/theme_provider.dart';
@@ -19,6 +23,7 @@ import 'ui/features/home_shell_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await initializeDateFormatting('bn');
 
   // Transparent system navigation bar and status bar for immersive glassmorphism
   SystemChrome.setSystemUIOverlayStyle(
@@ -37,7 +42,9 @@ void main() async {
 
   // Setup Repositories and Use Cases
   final profileDao = ProfileDao();
-  final ProfileRepository profileRepository = ProfileRepositoryImpl(profileDao: profileDao);
+  final ProfileRepository profileRepository = ProfileRepositoryImpl(
+    profileDao: profileDao,
+  );
 
   final calculateAgeUseCase = CalculateAgeUseCase();
   final calculateMilestonesUseCase = CalculateMilestonesUseCase();
@@ -50,9 +57,8 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider<ThemeProvider>(
-          create: (_) => ThemeProvider(),
-        ),
+        ChangeNotifierProvider<LocaleProvider>(create: (_) => LocaleProvider()),
+        ChangeNotifierProvider<ThemeProvider>(create: (_) => ThemeProvider()),
         ChangeNotifierProvider<DashboardViewModel>(
           create: (_) => DashboardViewModel(
             ageUseCase: calculateAgeUseCase,
@@ -60,9 +66,7 @@ void main() async {
           ),
         ),
         ChangeNotifierProvider<DateDiffViewModel>(
-          create: (_) => DateDiffViewModel(
-            useCase: calculateDateDiffUseCase,
-          ),
+          create: (_) => DateDiffViewModel(useCase: calculateDateDiffUseCase),
         ),
         ChangeNotifierProvider<FamilyFriendsViewModel>(
           create: (_) => FamilyFriendsViewModel(
@@ -84,11 +88,20 @@ class AgeCalculatorApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final themeProvider = context.watch<ThemeProvider>();
+    final localeProvider = context.watch<LocaleProvider>();
     final currentMonthColor = themeProvider.currentMonthColor;
 
     return MaterialApp(
       title: 'Age Calculator',
       debugShowCheckedModeBanner: false,
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+      ],
+      locale: localeProvider.locale,
+      supportedLocales: const [Locale('en'), Locale('bn')],
       themeMode: themeProvider.themeMode,
       theme: AppTheme.lightTheme(accentColor: currentMonthColor.primary),
       darkTheme: AppTheme.darkTheme(accentColor: currentMonthColor.primary),

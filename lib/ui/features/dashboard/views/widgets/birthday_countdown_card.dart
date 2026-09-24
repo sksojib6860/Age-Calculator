@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:age_calculator/core/constants/app_colors.dart';
 import 'package:age_calculator/core/constants/app_dimensions.dart';
 import 'package:age_calculator/core/constants/app_text_styles.dart';
+import 'package:age_calculator/core/localization/app_localizations.dart';
 import 'package:age_calculator/core/widgets/glass_card.dart';
 import 'package:age_calculator/domain/entities/age_result.dart';
 
@@ -21,8 +22,12 @@ class BirthdayCountdownCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final l10n = AppLocalizations.of(context);
     final isBirthdayToday = countdown.totalDaysRemaining == 0;
-    final formattedDate = DateFormat.yMMMMd().format(countdown.nextDate);
+    final formattedDate =
+        (l10n.isBangla ? DateFormat.yMMMMd('bn') : DateFormat.yMMMMd()).format(
+          countdown.nextDate,
+        );
 
     return GlassCard(
       padding: const EdgeInsets.all(AppDimensions.paddingLarge),
@@ -48,7 +53,7 @@ class BirthdayCountdownCard extends StatelessWidget {
                   ),
                   const SizedBox(width: 10),
                   Text(
-                    'Next Birthday Countdown',
+                    l10n.text('nextBirthday'),
                     style: AppTextStyles.titleMedium.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
@@ -56,7 +61,10 @@ class BirthdayCountdownCard extends StatelessWidget {
                 ],
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
                 decoration: BoxDecoration(
                   color: monthColor.primary.withOpacity(0.15),
                   borderRadius: BorderRadius.circular(12),
@@ -78,22 +86,22 @@ class BirthdayCountdownCard extends StatelessWidget {
           const SizedBox(height: 12),
           Text(
             isBirthdayToday
-                ? '🎉 Happy Birthday! Enjoy your special day!'
-                : 'Coming up on $formattedDate',
+                ? l10n.text('happyBirthday')
+                : l10n.comingUpOn(formattedDate),
             style: AppTextStyles.bodyMedium.copyWith(
-              color: isBirthdayToday ? Colors.amberAccent : (isDark ? Colors.grey.shade300 : Colors.grey.shade700),
+              color: isBirthdayToday
+                  ? Colors.amberAccent
+                  : (isDark ? Colors.grey.shade300 : Colors.grey.shade700),
               fontWeight: isBirthdayToday ? FontWeight.bold : FontWeight.w500,
             ),
           ),
           const SizedBox(height: 16),
-
-          // Countdown Units
           Row(
             children: [
               Expanded(
                 child: _buildCountUnit(
                   context,
-                  label: 'MONTHS',
+                  label: l10n.text('months').toUpperCase(),
                   value: countdown.remainingMonths.toString(),
                 ),
               ),
@@ -101,7 +109,7 @@ class BirthdayCountdownCard extends StatelessWidget {
               Expanded(
                 child: _buildCountUnit(
                   context,
-                  label: 'DAYS',
+                  label: l10n.text('days').toUpperCase(),
                   value: countdown.remainingDays.toString(),
                 ),
               ),
@@ -109,7 +117,7 @@ class BirthdayCountdownCard extends StatelessWidget {
               Expanded(
                 child: _buildCountUnit(
                   context,
-                  label: 'HOURS',
+                  label: l10n.text('hours').toUpperCase(),
                   value: countdown.remainingHours.toString(),
                 ),
               ),
@@ -117,21 +125,18 @@ class BirthdayCountdownCard extends StatelessWidget {
               Expanded(
                 child: _buildCountUnit(
                   context,
-                  label: 'MINS',
+                  label: l10n.text('minutes').toUpperCase(),
                   value: countdown.remainingMinutes.toString(),
                 ),
               ),
             ],
           ),
-
           const SizedBox(height: 18),
-
-          // Year Progress Bar
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Year Cycle Progress',
+                l10n.text('yearCycle'),
                 style: AppTextStyles.bodySmall.copyWith(
                   color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
                 ),
@@ -170,7 +175,9 @@ class BirthdayCountdownCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 12),
       decoration: BoxDecoration(
-        color: isDark ? Colors.white.withOpacity(0.06) : Colors.black.withOpacity(0.04),
+        color: isDark
+            ? Colors.white.withOpacity(0.06)
+            : Colors.black.withOpacity(0.04),
         borderRadius: BorderRadius.circular(14),
         border: Border.all(color: isDark ? Colors.white12 : Colors.black12),
       ),
@@ -178,10 +185,7 @@ class BirthdayCountdownCard extends StatelessWidget {
         children: [
           Text(
             value,
-            style: const TextStyle(
-              fontSize: 22,
-              fontWeight: FontWeight.w700,
-            ),
+            style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w700),
           ),
           const SizedBox(height: 2),
           Text(

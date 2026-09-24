@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:age_calculator/core/constants/app_colors.dart';
 import 'package:age_calculator/core/constants/app_dimensions.dart';
 import 'package:age_calculator/core/constants/app_text_styles.dart';
+import 'package:age_calculator/core/localization/app_localizations.dart';
 import 'package:age_calculator/core/widgets/glass_card.dart';
 import 'package:age_calculator/domain/entities/age_result.dart';
 
@@ -23,6 +24,8 @@ class LiveTickerCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context);
+
     return GlassCard(
       padding: const EdgeInsets.all(AppDimensions.paddingLarge),
       child: Column(
@@ -33,11 +36,10 @@ class LiveTickerCard extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  // Pulsing Live Indicator
-                  _buildPulseBadge(),
+                  _buildPulseBadge(l10n),
                   const SizedBox(width: 10),
                   Text(
-                    'Real-Time Life Ticker',
+                    l10n.text('realTimeTicker'),
                     style: AppTextStyles.titleMedium.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
@@ -46,31 +48,33 @@ class LiveTickerCard extends StatelessWidget {
               ),
               IconButton(
                 icon: Icon(
-                  isTickerActive ? Icons.pause_circle_outline : Icons.play_circle_outline,
+                  isTickerActive
+                      ? Icons.pause_circle_outline
+                      : Icons.play_circle_outline,
                   color: monthColor.primary,
                   size: 26,
                 ),
-                tooltip: isTickerActive ? 'Pause Ticker' : 'Resume Ticker',
+                tooltip: isTickerActive
+                    ? l10n.text('pauseTicker')
+                    : l10n.text('resumeTicker'),
                 onPressed: onToggleTicker,
               ),
             ],
           ),
           const SizedBox(height: 16),
           Text(
-            'Your existence ticking in live precision:',
+            l10n.text('existenceTicker'),
             style: AppTextStyles.bodySmall.copyWith(
               color: Colors.grey.shade400,
             ),
           ),
           const SizedBox(height: 16),
-
-          // Micro-ticker row: Hours, Minutes, Seconds
           Row(
             children: [
               Expanded(
                 child: _buildTimeBox(
                   context,
-                  label: 'HOURS',
+                  label: l10n.text('hours').toUpperCase(),
                   value: ageResult.hours.toString().padLeft(2, '0'),
                 ),
               ),
@@ -80,7 +84,7 @@ class LiveTickerCard extends StatelessWidget {
               Expanded(
                 child: _buildTimeBox(
                   context,
-                  label: 'MINS',
+                  label: l10n.text('minutes').toUpperCase(),
                   value: ageResult.minutes.toString().padLeft(2, '0'),
                 ),
               ),
@@ -90,7 +94,7 @@ class LiveTickerCard extends StatelessWidget {
               Expanded(
                 child: _buildTimeBox(
                   context,
-                  label: 'SECS',
+                  label: l10n.text('seconds').toUpperCase(),
                   value: ageResult.seconds.toString().padLeft(2, '0'),
                   highlight: true,
                 ),
@@ -102,7 +106,7 @@ class LiveTickerCard extends StatelessWidget {
     );
   }
 
-  Widget _buildPulseBadge() {
+  Widget _buildPulseBadge(AppLocalizations l10n) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
@@ -128,7 +132,7 @@ class LiveTickerCard extends StatelessWidget {
           ),
           const SizedBox(width: 4),
           Text(
-            isTickerActive ? 'LIVE' : 'PAUSED',
+            isTickerActive ? l10n.text('live') : l10n.text('paused'),
             style: TextStyle(
               color: isTickerActive ? Colors.greenAccent : Colors.grey,
               fontSize: 10,
@@ -165,10 +169,14 @@ class LiveTickerCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: highlight
             ? monthColor.primary.withOpacity(isDark ? 0.25 : 0.15)
-            : (isDark ? Colors.white.withOpacity(0.05) : Colors.black.withOpacity(0.04)),
+            : (isDark
+                  ? Colors.white.withOpacity(0.05)
+                  : Colors.black.withOpacity(0.04)),
         borderRadius: BorderRadius.circular(14),
         border: Border.all(
-          color: highlight ? monthColor.primary.withOpacity(0.6) : Colors.white12,
+          color: highlight
+              ? monthColor.primary.withOpacity(0.6)
+              : Colors.white12,
         ),
       ),
       child: Column(

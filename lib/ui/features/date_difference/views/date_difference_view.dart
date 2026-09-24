@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:age_calculator/core/constants/app_dimensions.dart';
 import 'package:age_calculator/core/constants/app_text_styles.dart';
+import 'package:age_calculator/core/localization/app_localizations.dart';
 import 'package:age_calculator/core/theme/theme_provider.dart';
 import 'package:age_calculator/core/widgets/custom_date_picker_field.dart';
 import 'package:age_calculator/core/widgets/glass_card.dart';
@@ -20,8 +21,9 @@ class DateDifferenceView extends StatelessWidget {
     final themeProvider = context.watch<ThemeProvider>();
     final monthColor = themeProvider.currentMonthColor;
     final isDark = themeProvider.isDarkMode;
+    final l10n = AppLocalizations.of(context);
     final result = viewModel.result;
-    final numberFormatter = NumberFormat('#,###');
+    final numberFormatter = NumberFormat('#,###', l10n.locale.toLanguageTag());
 
     return ResponsiveWrapper(
       child: SingleChildScrollView(
@@ -52,16 +54,18 @@ class DateDifferenceView extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Date Difference Utility',
+                          l10n.text('dateDifferenceUtility'),
                           style: AppTextStyles.titleLarge.copyWith(
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          'Compute duration and business days between dates',
+                          l10n.text('computeDuration'),
                           style: AppTextStyles.bodySmall.copyWith(
-                            color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
+                            color: isDark
+                                ? Colors.grey.shade400
+                                : Colors.grey.shade600,
                           ),
                         ),
                       ],
@@ -76,7 +80,7 @@ class DateDifferenceView extends StatelessWidget {
             CustomDatePickerField(
               selectedDate: viewModel.startDate,
               onDateChanged: viewModel.setStartDate,
-              label: 'START DATE',
+              label: l10n.text('startDate'),
               monthColor: monthColor,
             ),
             const SizedBox(height: 8),
@@ -96,7 +100,7 @@ class DateDifferenceView extends StatelessWidget {
             CustomDatePickerField(
               selectedDate: viewModel.endDate,
               onDateChanged: viewModel.setEndDate,
-              label: 'END DATE',
+              label: l10n.text('endDate'),
               monthColor: monthColor,
             ),
             const SizedBox(height: 16),
@@ -108,7 +112,7 @@ class DateDifferenceView extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
-                    'Include end day (+1 day)',
+                    l10n.text('includeEndDay'),
                     style: AppTextStyles.bodyMedium.copyWith(
                       fontWeight: FontWeight.w600,
                     ),
@@ -131,9 +135,11 @@ class DateDifferenceView extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'TOTAL DURATION',
+                      l10n.text('totalDuration'),
                       style: AppTextStyles.labelCaps.copyWith(
-                        color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
+                        color: isDark
+                            ? Colors.grey.shade400
+                            : Colors.grey.shade600,
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -141,11 +147,26 @@ class DateDifferenceView extends StatelessWidget {
                     // Years, Months, Days Breakdown
                     Row(
                       children: [
-                        _buildDurationPill(context, '${result.years}', 'Years', monthColor.primary),
+                        _buildDurationPill(
+                          context,
+                          '${result.years}',
+                          l10n.text('years'),
+                          monthColor.primary,
+                        ),
                         const SizedBox(width: 8),
-                        _buildDurationPill(context, '${result.months}', 'Months', monthColor.primary),
+                        _buildDurationPill(
+                          context,
+                          '${result.months}',
+                          l10n.text('months'),
+                          monthColor.primary,
+                        ),
                         const SizedBox(width: 8),
-                        _buildDurationPill(context, '${result.days}', 'Days', monthColor.primary),
+                        _buildDurationPill(
+                          context,
+                          '${result.days}',
+                          l10n.text('days'),
+                          monthColor.primary,
+                        ),
                       ],
                     ),
                     const SizedBox(height: 20),
@@ -160,9 +181,9 @@ class DateDifferenceView extends StatelessWidget {
                             context,
                             icon: Icons.work_outline_rounded,
                             iconColor: Colors.blueAccent,
-                            label: 'Working Days',
+                            label: l10n.text('workingDays'),
                             value: numberFormatter.format(result.workingDays),
-                            subtext: 'Mon - Fri',
+                            subtext: l10n.text('monFri'),
                           ),
                         ),
                         const SizedBox(width: 12),
@@ -171,9 +192,9 @@ class DateDifferenceView extends StatelessWidget {
                             context,
                             icon: Icons.weekend_outlined,
                             iconColor: Colors.amberAccent,
-                            label: 'Weekend Days',
+                            label: l10n.text('weekendDays'),
                             value: numberFormatter.format(result.weekendDays),
-                            subtext: 'Sat & Sun',
+                            subtext: l10n.text('satSun'),
                           ),
                         ),
                       ],
@@ -184,9 +205,10 @@ class DateDifferenceView extends StatelessWidget {
                       context,
                       icon: Icons.calendar_today_rounded,
                       iconColor: monthColor.primary,
-                      label: 'Total Calendar Days',
+                      label: l10n.text('totalCalendarDays'),
                       value: numberFormatter.format(result.totalDays),
-                      subtext: '${(result.totalDays / 7).floor()} full weeks & ${result.totalDays % 7} days',
+                      subtext:
+                          '${(result.totalDays / 7).floor()} full weeks & ${result.totalDays % 7} days',
                     ),
                   ],
                 ),
@@ -199,7 +221,12 @@ class DateDifferenceView extends StatelessWidget {
     );
   }
 
-  Widget _buildDurationPill(BuildContext context, String value, String unit, Color accent) {
+  Widget _buildDurationPill(
+    BuildContext context,
+    String value,
+    String unit,
+    Color accent,
+  ) {
     return Expanded(
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 14),
@@ -219,10 +246,7 @@ class DateDifferenceView extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 2),
-            Text(
-              unit,
-              style: AppTextStyles.labelCaps.copyWith(fontSize: 10),
-            ),
+            Text(unit, style: AppTextStyles.labelCaps.copyWith(fontSize: 10)),
           ],
         ),
       ),
@@ -242,7 +266,9 @@ class DateDifferenceView extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: isDark ? Colors.white.withOpacity(0.04) : Colors.black.withOpacity(0.03),
+        color: isDark
+            ? Colors.white.withOpacity(0.04)
+            : Colors.black.withOpacity(0.03),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: isDark ? Colors.white12 : Colors.black12),
       ),
@@ -279,10 +305,7 @@ class DateDifferenceView extends StatelessWidget {
           ),
           Text(
             value,
-            style: const TextStyle(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-            ),
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
           ),
         ],
       ),

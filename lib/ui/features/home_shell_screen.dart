@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_dimensions.dart';
+import '../../core/localization/app_localizations.dart';
 import '../../core/theme/theme_provider.dart';
 import '../../core/widgets/glass_card.dart';
 import 'dashboard/views/dashboard_screen.dart';
@@ -26,6 +27,7 @@ class _HomeShellScreenState extends State<HomeShellScreen> {
 
     final monthColor = themeProvider.currentMonthColor;
     final isDark = themeProvider.isDarkMode;
+    final l10n = AppLocalizations.of(context);
 
     final screens = [
       const DashboardScreen(),
@@ -130,21 +132,21 @@ class _HomeShellScreenState extends State<HomeShellScreen> {
                   index: 0,
                   icon: Icons.cake_outlined,
                   activeIcon: Icons.cake_rounded,
-                  label: 'Calculator',
+                  label: l10n.text('calculator'),
                   monthColor: monthColor,
                 ),
                 _buildNavItem(
                   index: 1,
                   icon: Icons.date_range_outlined,
                   activeIcon: Icons.date_range_rounded,
-                  label: 'Difference',
+                  label: l10n.text('difference'),
                   monthColor: monthColor,
                 ),
                 _buildNavItem(
                   index: 2,
                   icon: Icons.people_outline_rounded,
                   activeIcon: Icons.people_rounded,
-                  label: 'Friends & Family',
+                  label: l10n.text('familyFriends'),
                   monthColor: monthColor,
                 ),
               ],

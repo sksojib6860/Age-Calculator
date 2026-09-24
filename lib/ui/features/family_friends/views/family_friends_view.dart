@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:age_calculator/core/constants/app_dimensions.dart';
 import 'package:age_calculator/core/constants/app_text_styles.dart';
+import 'package:age_calculator/core/localization/app_localizations.dart';
 import 'package:age_calculator/core/theme/theme_provider.dart';
 import 'package:age_calculator/core/utils/date_calculator.dart';
 import 'package:age_calculator/core/widgets/glass_card.dart';
@@ -17,10 +18,7 @@ import 'add_edit_profile_sheet.dart';
 class FamilyFriendsView extends StatelessWidget {
   final VoidCallback onNavigateToDashboard;
 
-  const FamilyFriendsView({
-    super.key,
-    required this.onNavigateToDashboard,
-  });
+  const FamilyFriendsView({super.key, required this.onNavigateToDashboard});
 
   final List<Color> _avatarColors = const [
     Colors.purpleAccent,
@@ -31,10 +29,7 @@ class FamilyFriendsView extends StatelessWidget {
     Colors.indigoAccent,
   ];
 
-  void _showAddEditSheet(
-    BuildContext context, {
-    FriendProfile? profile,
-  }) {
+  void _showAddEditSheet(BuildContext context, {FriendProfile? profile}) {
     final themeProvider = context.read<ThemeProvider>();
     final familyVm = context.read<FamilyFriendsViewModel>();
 
@@ -63,8 +58,15 @@ class FamilyFriendsView extends StatelessWidget {
     final dashboardVm = context.read<DashboardViewModel>();
     final monthColor = themeProvider.currentMonthColor;
     final isDark = themeProvider.isDarkMode;
+    final l10n = AppLocalizations.of(context);
 
-    final categories = ['All', 'Family', 'Friend', 'Partner', 'Colleague'];
+    final categories = [
+      ('All', l10n.text('all')),
+      ('Family', l10n.text('family')),
+      ('Friend', l10n.text('friend')),
+      ('Partner', l10n.text('partner')),
+      ('Colleague', l10n.text('colleague')),
+    ];
 
     return ResponsiveWrapper(
       child: Column(
@@ -95,15 +97,17 @@ class FamilyFriendsView extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Family & Friends',
+                          l10n.text('familyFriendsTitle'),
                           style: AppTextStyles.titleLarge.copyWith(
                             fontWeight: FontWeight.bold,
                           ),
                         ),
                         Text(
-                          '${viewModel.profiles.length} saved profiles',
+                          l10n.savedProfiles(viewModel.profiles.length),
                           style: AppTextStyles.bodySmall.copyWith(
-                            color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
+                            color: isDark
+                                ? Colors.grey.shade400
+                                : Colors.grey.shade600,
                           ),
                         ),
                       ],
@@ -115,13 +119,16 @@ class FamilyFriendsView extends StatelessWidget {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: monthColor.primary,
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14,
+                      vertical: 10,
+                    ),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(14),
                     ),
                   ),
                   icon: const Icon(Icons.add, size: 18),
-                  label: const Text('Add'),
+                  label: Text(l10n.text('add')),
                 ),
               ],
             ),
@@ -132,16 +139,20 @@ class FamilyFriendsView extends StatelessWidget {
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
-              children: categories.map((cat) {
-                final isSelected = (viewModel.selectedCategory == null && cat == 'All') ||
-                    viewModel.selectedCategory == cat;
+              children: categories.map((category) {
+                final isSelected =
+                    (viewModel.selectedCategory == null &&
+                        category.$1 == 'All') ||
+                    viewModel.selectedCategory == category.$1;
                 return Padding(
                   padding: const EdgeInsets.only(right: 8),
                   child: FilterChip(
-                    label: Text(cat),
+                    label: Text(category.$2),
                     selected: isSelected,
                     selectedColor: monthColor.primary.withOpacity(0.25),
-                    onSelected: (_) => viewModel.filterCategory(cat == 'All' ? null : cat),
+                    onSelected: (_) => viewModel.filterCategory(
+                      category.$1 == 'All' ? null : category.$1,
+                    ),
                   ),
                 );
               }).toList(),
@@ -154,27 +165,31 @@ class FamilyFriendsView extends StatelessWidget {
             child: viewModel.isLoading
                 ? const Center(child: CircularProgressIndicator())
                 : viewModel.profiles.isEmpty
-                    ? _buildEmptyState(context, isDark, monthColor.primary)
-                    : ListView.separated(
-                        physics: const BouncingScrollPhysics(),
-                        itemCount: viewModel.profiles.length,
-                        separatorBuilder: (_, __) => const SizedBox(height: 10),
-                        itemBuilder: (context, index) {
-                          final profile = viewModel.profiles[index];
-                          return _buildProfileCard(
-                            context,
-                            profile: profile,
-                            isDark: isDark,
-                            accentColor: monthColor.primary,
-                            onTap: () {
-                              dashboardVm.setDob(profile.dob, profileName: profile.name);
-                              onNavigateToDashboard();
-                            },
-                            onEdit: () => _showAddEditSheet(context, profile: profile),
-                            onDelete: () => viewModel.deleteProfile(profile.id),
+                ? _buildEmptyState(context, isDark, monthColor.primary)
+                : ListView.separated(
+                    physics: const BouncingScrollPhysics(),
+                    itemCount: viewModel.profiles.length,
+                    separatorBuilder: (_, __) => const SizedBox(height: 10),
+                    itemBuilder: (context, index) {
+                      final profile = viewModel.profiles[index];
+                      return _buildProfileCard(
+                        context,
+                        profile: profile,
+                        isDark: isDark,
+                        accentColor: monthColor.primary,
+                        onTap: () {
+                          dashboardVm.setDob(
+                            profile.dob,
+                            profileName: profile.name,
                           );
+                          onNavigateToDashboard();
                         },
-                      ),
+                        onEdit: () =>
+                            _showAddEditSheet(context, profile: profile),
+                        onDelete: () => viewModel.deleteProfile(profile.id),
+                      );
+                    },
+                  ),
           ),
         ],
       ),
@@ -182,6 +197,8 @@ class FamilyFriendsView extends StatelessWidget {
   }
 
   Widget _buildEmptyState(BuildContext context, bool isDark, Color accent) {
+    final l10n = AppLocalizations.of(context);
+
     return Center(
       child: GlassCard(
         padding: const EdgeInsets.all(32),
@@ -194,13 +211,13 @@ class FamilyFriendsView extends StatelessWidget {
               color: accent.withOpacity(0.8),
             ),
             const SizedBox(height: 16),
-            const Text(
-              'No Profiles Added Yet',
+            Text(
+              l10n.text('noProfiles'),
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 8),
             Text(
-              'Save your friends and family birthdays to check their exact age with 1-tap and get reminders!',
+              l10n.text('saveBirthdays'),
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 13,
@@ -218,7 +235,7 @@ class FamilyFriendsView extends StatelessWidget {
                 ),
               ),
               icon: const Icon(Icons.person_add),
-              label: const Text('Add First Profile'),
+              label: Text(l10n.text('addFirstProfile')),
             ),
           ],
         ),
@@ -235,9 +252,11 @@ class FamilyFriendsView extends StatelessWidget {
     required VoidCallback onEdit,
     required VoidCallback onDelete,
   }) {
-    final avatarColor = _avatarColors[profile.avatarColorIndex % _avatarColors.length];
+    final avatarColor =
+        _avatarColors[profile.avatarColorIndex % _avatarColors.length];
     final ageResult = DateCalculator.calculateAge(profile.dob);
     final daysToBday = ageResult.nextBirthday.totalDaysRemaining;
+    final l10n = AppLocalizations.of(context);
 
     return GlassCard(
       onTap: onTap,
@@ -279,7 +298,10 @@ class FamilyFriendsView extends StatelessWidget {
                     ),
                     const SizedBox(width: 8),
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 6,
+                        vertical: 2,
+                      ),
                       decoration: BoxDecoration(
                         color: accentColor.withOpacity(0.15),
                         borderRadius: BorderRadius.circular(6),
@@ -297,7 +319,10 @@ class FamilyFriendsView extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  DateFormat.yMMMMd().format(profile.dob),
+                  (l10n.isBangla
+                          ? DateFormat.yMMMMd('bn')
+                          : DateFormat.yMMMMd())
+                      .format(profile.dob),
                   style: TextStyle(
                     fontSize: 12,
                     color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
@@ -309,19 +334,28 @@ class FamilyFriendsView extends StatelessWidget {
                   children: [
                     // Age Badge
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 2,
+                      ),
                       decoration: BoxDecoration(
                         color: isDark ? Colors.white10 : Colors.black12,
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Text(
                         '${ageResult.years}y ${ageResult.months}m old',
-                        style: const TextStyle(fontSize: 11, fontWeight: FontWeight.bold),
+                        style: const TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                     // Birthday countdown chip
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 2,
+                      ),
                       decoration: BoxDecoration(
                         color: daysToBday == 0
                             ? Colors.amber.withOpacity(0.3)
@@ -329,11 +363,15 @@ class FamilyFriendsView extends StatelessWidget {
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: Text(
-                        daysToBday == 0 ? '🎂 Birthday Today!' : '🎂 in $daysToBday days',
+                        daysToBday == 0
+                            ? '🎂 Birthday Today!'
+                            : '🎂 in $daysToBday days',
                         style: TextStyle(
                           fontSize: 11,
                           fontWeight: FontWeight.w600,
-                          color: daysToBday == 0 ? Colors.amberAccent : Colors.lightBlueAccent,
+                          color: daysToBday == 0
+                              ? Colors.amberAccent
+                              : Colors.lightBlueAccent,
                         ),
                       ),
                     ),
@@ -352,33 +390,40 @@ class FamilyFriendsView extends StatelessWidget {
               if (val == 'delete') onDelete();
             },
             itemBuilder: (ctx) => [
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: 'calc',
                 child: Row(
                   children: [
                     Icon(Icons.calculate_outlined, size: 18),
                     SizedBox(width: 8),
-                    Text('Open in Calculator'),
+                    Text(AppLocalizations.of(context).text('openCalculator')),
                   ],
                 ),
               ),
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: 'edit',
                 child: Row(
                   children: [
                     Icon(Icons.edit_outlined, size: 18),
                     SizedBox(width: 8),
-                    Text('Edit'),
+                    Text(AppLocalizations.of(context).text('edit')),
                   ],
                 ),
               ),
-              const PopupMenuItem(
+              PopupMenuItem(
                 value: 'delete',
                 child: Row(
                   children: [
-                    Icon(Icons.delete_outline, size: 18, color: Colors.redAccent),
+                    Icon(
+                      Icons.delete_outline,
+                      size: 18,
+                      color: Colors.redAccent,
+                    ),
                     SizedBox(width: 8),
-                    Text('Delete', style: TextStyle(color: Colors.redAccent)),
+                    Text(
+                      AppLocalizations.of(context).text('delete'),
+                      style: TextStyle(color: Colors.redAccent),
+                    ),
                   ],
                 ),
               ),

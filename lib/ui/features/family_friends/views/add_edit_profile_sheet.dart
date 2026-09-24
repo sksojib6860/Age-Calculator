@@ -4,6 +4,7 @@ import 'package:uuid/uuid.dart';
 import 'package:age_calculator/core/constants/app_colors.dart';
 import 'package:age_calculator/core/constants/app_dimensions.dart';
 import 'package:age_calculator/core/constants/app_text_styles.dart';
+import 'package:age_calculator/core/localization/app_localizations.dart';
 import 'package:age_calculator/domain/entities/friend_profile.dart';
 
 class AddEditProfileSheet extends StatefulWidget {
@@ -76,9 +77,9 @@ class _AddEditProfileSheetState extends State<AddEditProfileSheet> {
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme: Theme.of(context).colorScheme.copyWith(
-                  primary: widget.monthColor.primary,
-                  onPrimary: Colors.white,
-                ),
+              primary: widget.monthColor.primary,
+              onPrimary: Colors.white,
+            ),
           ),
           child: child!,
         );
@@ -93,7 +94,9 @@ class _AddEditProfileSheetState extends State<AddEditProfileSheet> {
     final name = _nameController.text.trim();
     if (name.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter a name')),
+        SnackBar(
+          content: Text(AppLocalizations.of(context).text('pleaseEnterName')),
+        ),
       );
       return;
     }
@@ -104,7 +107,9 @@ class _AddEditProfileSheetState extends State<AddEditProfileSheet> {
       dob: _selectedDob,
       relationship: _relationship,
       avatarColorIndex: _avatarColorIndex,
-      notes: _notesController.text.trim().isEmpty ? null : _notesController.text.trim(),
+      notes: _notesController.text.trim().isEmpty
+          ? null
+          : _notesController.text.trim(),
       enableReminder: _enableReminder,
     );
 
@@ -116,6 +121,7 @@ class _AddEditProfileSheetState extends State<AddEditProfileSheet> {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final isEditing = widget.initialProfile != null;
+    final l10n = AppLocalizations.of(context);
 
     return Padding(
       padding: EdgeInsets.only(
@@ -144,8 +150,12 @@ class _AddEditProfileSheetState extends State<AddEditProfileSheet> {
               ),
               const SizedBox(height: 16),
               Text(
-                isEditing ? 'Edit Profile' : 'Add Family or Friend',
-                style: AppTextStyles.titleLarge.copyWith(fontWeight: FontWeight.bold),
+                isEditing
+                    ? l10n.text('editProfile')
+                    : l10n.text('addFamilyFriend'),
+                style: AppTextStyles.titleLarge.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
               ),
               const SizedBox(height: 20),
 
@@ -153,10 +163,12 @@ class _AddEditProfileSheetState extends State<AddEditProfileSheet> {
               TextField(
                 controller: _nameController,
                 decoration: InputDecoration(
-                  labelText: 'Full Name',
+                  labelText: l10n.text('fullName'),
                   prefixIcon: const Icon(Icons.person_outline),
                   filled: true,
-                  fillColor: isDark ? Colors.white.withOpacity(0.05) : Colors.black.withOpacity(0.04),
+                  fillColor: isDark
+                      ? Colors.white.withOpacity(0.05)
+                      : Colors.black.withOpacity(0.04),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(16),
                     borderSide: BorderSide.none,
@@ -170,9 +182,14 @@ class _AddEditProfileSheetState extends State<AddEditProfileSheet> {
                 borderRadius: BorderRadius.circular(16),
                 onTap: _pickDob,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 14,
+                  ),
                   decoration: BoxDecoration(
-                    color: isDark ? Colors.white.withOpacity(0.05) : Colors.black.withOpacity(0.04),
+                    color: isDark
+                        ? Colors.white.withOpacity(0.05)
+                        : Colors.black.withOpacity(0.04),
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Row(
@@ -180,16 +197,22 @@ class _AddEditProfileSheetState extends State<AddEditProfileSheet> {
                     children: [
                       Row(
                         children: [
-                          Icon(Icons.cake_outlined, color: widget.monthColor.primary),
+                          Icon(
+                            Icons.cake_outlined,
+                            color: widget.monthColor.primary,
+                          ),
                           const SizedBox(width: 12),
                           Text(
-                            DateFormat.yMMMMd().format(_selectedDob),
+                            (AppLocalizations.of(context).isBangla
+                                    ? DateFormat.yMMMMd('bn')
+                                    : DateFormat.yMMMMd())
+                                .format(_selectedDob),
                             style: const TextStyle(fontWeight: FontWeight.w600),
                           ),
                         ],
                       ),
                       Text(
-                        'Change',
+                        l10n.text('change'),
                         style: TextStyle(
                           color: widget.monthColor.primary,
                           fontWeight: FontWeight.bold,
@@ -203,7 +226,7 @@ class _AddEditProfileSheetState extends State<AddEditProfileSheet> {
 
               // Relationship Chips
               Text(
-                'RELATIONSHIP',
+                l10n.text('relationship'),
                 style: AppTextStyles.labelCaps.copyWith(
                   color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
                 ),
@@ -225,7 +248,7 @@ class _AddEditProfileSheetState extends State<AddEditProfileSheet> {
 
               // Avatar Color Choice
               Text(
-                'AVATAR ACCENT',
+                l10n.text('avatarAccent'),
                 style: AppTextStyles.labelCaps.copyWith(
                   color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
                 ),
@@ -248,7 +271,12 @@ class _AddEditProfileSheetState extends State<AddEditProfileSheet> {
                             ? Border.all(color: Colors.white, width: 3)
                             : null,
                         boxShadow: isSelected
-                            ? [BoxShadow(color: color.withOpacity(0.6), blurRadius: 8)]
+                            ? [
+                                BoxShadow(
+                                  color: color.withOpacity(0.6),
+                                  blurRadius: 8,
+                                ),
+                              ]
                             : null,
                       ),
                     ),
@@ -260,8 +288,8 @@ class _AddEditProfileSheetState extends State<AddEditProfileSheet> {
               // Birthday Reminder Switch
               SwitchListTile(
                 contentPadding: EdgeInsets.zero,
-                title: const Text('Offline Birthday Reminder'),
-                subtitle: const Text('Send notification when birthday arrives'),
+                title: Text(l10n.text('offlineReminder')),
+                subtitle: Text(l10n.text('birthdayNotification')),
                 value: _enableReminder,
                 activeColor: widget.monthColor.primary,
                 onChanged: (val) => setState(() => _enableReminder = val),
@@ -281,7 +309,9 @@ class _AddEditProfileSheetState extends State<AddEditProfileSheet> {
                     ),
                   ),
                   child: Text(
-                    isEditing ? 'Save Changes' : 'Add Profile',
+                    isEditing
+                        ? l10n.text('saveChanges')
+                        : l10n.text('addProfile'),
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 16,

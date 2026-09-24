@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 import 'package:age_calculator/core/constants/app_colors.dart';
 import 'package:age_calculator/core/constants/app_dimensions.dart';
 import 'package:age_calculator/core/constants/app_text_styles.dart';
+import 'package:age_calculator/core/localization/app_localizations.dart';
 import 'package:age_calculator/core/widgets/glass_card.dart';
 import 'package:age_calculator/domain/entities/life_milestones.dart';
 
@@ -22,7 +23,8 @@ class MilestonesCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final numberFormatter = NumberFormat('#,###');
+    final l10n = AppLocalizations.of(context);
+    final numberFormatter = NumberFormat('#,###', l10n.locale.toLanguageTag());
 
     return GlassCard(
       padding: const EdgeInsets.all(AppDimensions.paddingLarge),
@@ -45,7 +47,7 @@ class MilestonesCard extends StatelessWidget {
               ),
               const SizedBox(width: 10),
               Text(
-                'Life Milestones & Infographics',
+                l10n.text('milestones'),
                 style: AppTextStyles.titleMedium.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
@@ -62,9 +64,9 @@ class MilestonesCard extends StatelessWidget {
                   context,
                   icon: Icons.favorite,
                   iconColor: Colors.redAccent,
-                  label: 'Heartbeats',
-                  value: _formatBigInt(milestones.totalHeartbeats),
-                  subText: '~80 bpm avg',
+                  label: l10n.text('heartbeats'),
+                  value: l10n.number(_formatBigInt(milestones.totalHeartbeats)),
+                  subText: l10n.text('heartRateAverage'),
                 ),
               ),
               const SizedBox(width: 10),
@@ -73,15 +75,19 @@ class MilestonesCard extends StatelessWidget {
                   context,
                   icon: Icons.air,
                   iconColor: Colors.lightBlueAccent,
-                  label: 'Breaths Taken',
-                  value: _formatBigInt(milestones.totalBreaths),
-                  subText: '~16 bpm avg',
+                  label: l10n.text('breathsTaken'),
+                  value: l10n.number(_formatBigInt(milestones.totalBreaths)),
+                  subText: l10n.text('breathRateAverage'),
                 ),
               ),
             ],
           ),
           const SizedBox(height: 10),
-          _buildSleepTile(context, numberFormatter.format(milestones.totalSleepHours)),
+          _buildSleepTile(
+            context,
+            l10n,
+            l10n.number(numberFormatter.format(milestones.totalSleepHours)),
+          ),
 
           const SizedBox(height: 18),
           const Divider(color: Colors.white24, height: 1),
@@ -89,7 +95,7 @@ class MilestonesCard extends StatelessWidget {
 
           // Zodiac Infographics (Western & Chinese)
           Text(
-            'ASTROLOGICAL PROFILE',
+            l10n.text('astrologicalProfile'),
             style: AppTextStyles.labelCaps.copyWith(
               color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
             ),
@@ -101,7 +107,7 @@ class MilestonesCard extends StatelessWidget {
               Expanded(
                 child: _buildZodiacCard(
                   context,
-                  title: 'Western Sign',
+                  title: l10n.text('westernSign'),
                   symbol: milestones.westernZodiac.symbol,
                   name: milestones.westernZodiac.name,
                   badge: milestones.westernZodiac.element,
@@ -114,11 +120,11 @@ class MilestonesCard extends StatelessWidget {
               Expanded(
                 child: _buildZodiacCard(
                   context,
-                  title: 'Chinese Sign',
+                  title: l10n.text('chineseSign'),
                   symbol: milestones.chineseZodiac.symbol,
                   name: milestones.chineseZodiac.animal,
                   badge: milestones.chineseZodiac.element,
-                  dateRange: 'Lunar cycle',
+                  dateRange: l10n.text('lunarCycle'),
                   traits: milestones.chineseZodiac.traits,
                 ),
               ),
@@ -156,7 +162,9 @@ class MilestonesCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: isDark ? Colors.white.withOpacity(0.05) : Colors.black.withOpacity(0.04),
+        color: isDark
+            ? Colors.white.withOpacity(0.05)
+            : Colors.black.withOpacity(0.04),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: isDark ? Colors.white12 : Colors.black12),
       ),
@@ -184,10 +192,7 @@ class MilestonesCard extends StatelessWidget {
             fit: BoxFit.scaleDown,
             child: Text(
               value,
-              style: const TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
+              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
           ),
           const SizedBox(height: 2),
@@ -203,13 +208,19 @@ class MilestonesCard extends StatelessWidget {
     );
   }
 
-  Widget _buildSleepTile(BuildContext context, String hoursFormatted) {
+  Widget _buildSleepTile(
+    BuildContext context,
+    AppLocalizations l10n,
+    String hoursFormatted,
+  ) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
-        color: isDark ? Colors.white.withOpacity(0.05) : Colors.black.withOpacity(0.04),
+        color: isDark
+            ? Colors.white.withOpacity(0.05)
+            : Colors.black.withOpacity(0.04),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: isDark ? Colors.white12 : Colors.black12),
       ),
@@ -221,7 +232,11 @@ class MilestonesCard extends StatelessWidget {
               color: Colors.indigoAccent.withOpacity(0.2),
               borderRadius: BorderRadius.circular(10),
             ),
-            child: const Icon(Icons.bedtime, color: Colors.indigoAccent, size: 20),
+            child: const Icon(
+              Icons.bedtime,
+              color: Colors.indigoAccent,
+              size: 20,
+            ),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -229,13 +244,13 @@ class MilestonesCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Hours Spent Sleeping',
+                  l10n.text('hoursSleeping'),
                   style: AppTextStyles.bodySmall.copyWith(
                     fontWeight: FontWeight.w600,
                   ),
                 ),
                 Text(
-                  'Based on ~8 hours of healthy rest per day',
+                  l10n.text('healthyRest'),
                   style: TextStyle(
                     fontSize: 11,
                     color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
@@ -245,11 +260,8 @@ class MilestonesCard extends StatelessWidget {
             ),
           ),
           Text(
-            '$hoursFormatted hrs',
-            style: const TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.bold,
-            ),
+            '$hoursFormatted ${l10n.text('hours')}',
+            style: const TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
           ),
         ],
       ),
@@ -270,7 +282,9 @@ class MilestonesCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: isDark ? Colors.white.withOpacity(0.04) : Colors.black.withOpacity(0.03),
+        color: isDark
+            ? Colors.white.withOpacity(0.04)
+            : Colors.black.withOpacity(0.03),
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: isDark ? Colors.white12 : Colors.black12),
       ),

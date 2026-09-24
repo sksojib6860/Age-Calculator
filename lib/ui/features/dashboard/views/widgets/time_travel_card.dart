@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:age_calculator/core/constants/app_colors.dart';
 import 'package:age_calculator/core/constants/app_dimensions.dart';
 import 'package:age_calculator/core/constants/app_text_styles.dart';
+import 'package:age_calculator/core/localization/app_localizations.dart';
 import 'package:age_calculator/core/widgets/glass_card.dart';
 import 'package:age_calculator/domain/entities/age_result.dart';
 
@@ -24,6 +25,7 @@ class TimeTravelCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final l10n = AppLocalizations.of(context);
     final currentYear = DateTime.now().year;
     final maxYear = currentYear + 60;
 
@@ -48,7 +50,7 @@ class TimeTravelCard extends StatelessWidget {
               ),
               const SizedBox(width: 10),
               Text(
-                'Time Travel & Future Age',
+                l10n.text('timeTravel'),
                 style: AppTextStyles.titleMedium.copyWith(
                   fontWeight: FontWeight.bold,
                 ),
@@ -57,7 +59,7 @@ class TimeTravelCard extends StatelessWidget {
           ),
           const SizedBox(height: 12),
           Text(
-            'Slide into the future to see your age and birthday milestone:',
+            l10n.text('timeTravelHint'),
             style: AppTextStyles.bodySmall.copyWith(
               color: isDark ? Colors.grey.shade400 : Colors.grey.shade600,
             ),
@@ -77,9 +79,7 @@ class TimeTravelCard extends StatelessWidget {
                 end: Alignment.bottomRight,
               ),
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: monthColor.primary.withOpacity(0.4),
-              ),
+              border: Border.all(color: monthColor.primary.withOpacity(0.4)),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -88,7 +88,7 @@ class TimeTravelCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'In Year $futureYear',
+                      l10n.inYear(futureYear),
                       style: AppTextStyles.titleMedium.copyWith(
                         fontWeight: FontWeight.bold,
                       ),
@@ -96,23 +96,28 @@ class TimeTravelCard extends StatelessWidget {
                     const SizedBox(height: 4),
                     Text(
                       futureAgeResult != null
-                          ? 'Birthday will be on a ${futureAgeResult!.dayOfWeek}'
+                          ? l10n.birthdayWillBe(futureAgeResult!.dayOfWeek)
                           : '',
                       style: AppTextStyles.bodySmall.copyWith(
-                        color: isDark ? Colors.grey.shade300 : Colors.grey.shade700,
+                        color: isDark
+                            ? Colors.grey.shade300
+                            : Colors.grey.shade700,
                       ),
                     ),
                   ],
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
                   decoration: BoxDecoration(
                     color: monthColor.primary,
                     borderRadius: BorderRadius.circular(14),
                   ),
                   child: Text(
                     futureAgeResult != null
-                        ? '${futureAgeResult!.age} yrs old'
+                        ? l10n.ageYears(futureAgeResult!.age)
                         : '--',
                     style: const TextStyle(
                       color: Colors.white,
@@ -132,7 +137,9 @@ class TimeTravelCard extends StatelessWidget {
             children: [
               Text(
                 '$currentYear',
-                style: AppTextStyles.bodySmall.copyWith(fontWeight: FontWeight.w600),
+                style: AppTextStyles.bodySmall.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
               ),
               Expanded(
                 child: SliderTheme(
@@ -160,7 +167,9 @@ class TimeTravelCard extends StatelessWidget {
               ),
               Text(
                 '$maxYear',
-                style: AppTextStyles.bodySmall.copyWith(fontWeight: FontWeight.w600),
+                style: AppTextStyles.bodySmall.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
               ),
             ],
           ),
@@ -169,9 +178,9 @@ class TimeTravelCard extends StatelessWidget {
           Wrap(
             spacing: 8,
             children: [
-              _buildPresetChip(currentYear + 5, '+5 Yrs'),
-              _buildPresetChip(currentYear + 10, '+10 Yrs'),
-              _buildPresetChip(currentYear + 25, '+25 Yrs'),
+              _buildPresetChip(currentYear + 5, l10n.plusYears(5)),
+              _buildPresetChip(currentYear + 10, l10n.plusYears(10)),
+              _buildPresetChip(currentYear + 25, l10n.plusYears(25)),
               _buildPresetChip(2050, '2050'),
             ],
           ),
