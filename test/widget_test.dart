@@ -82,4 +82,48 @@ void main() {
     expect(find.text('Next Birthday Countdown'), findsOneWidget);
     expect(find.text('Time Travel & Future Age'), findsOneWidget);
   });
+
+  testWidgets('Syncs dashboard birth month into ThemeProvider after first frame',
+      (WidgetTester tester) async {
+    final mockRepo = MockProfileRepository();
+    final themeProvider = ThemeProvider();
+
+    await tester.pumpWidget(
+      MultiProvider(
+        providers: [
+          ChangeNotifierProvider<ThemeProvider>.value(value: themeProvider),
+          ChangeNotifierProvider<DashboardViewModel>(
+            create: (_) => DashboardViewModel(
+              ageUseCase: CalculateAgeUseCase(),
+              milestonesUseCase: CalculateMilestonesUseCase(),
+            ),
+          ),
+          ChangeNotifierProvider<DateDiffViewModel>(
+            create: (_) => DateDiffViewModel(
+              useCase: CalculateDateDiffUseCase(),
+            ),
+          ),
+          ChangeNotifierProvider<FamilyFriendsViewModel>(
+            create: (_) => FamilyFriendsViewModel(
+              getProfilesUseCase: GetProfilesUseCase(mockRepo),
+              saveProfileUseCase: SaveProfileUseCase(mockRepo),
+              deleteProfileUseCase: DeleteProfileUseCase(mockRepo),
+            ),
+          ),
+        ],
+        child: const MaterialApp(
+          home: HomeShellScreen(),
+        ),
+      ),
+    );
+
+    await tester.pumpAndSettle();
+
+    // Must not throw "setState() or markNeedsBuild() called during build".
+    expect(tester.takeException(), isNull);
+
+    // Default DOB is 1998-05-15, so the May accent must be applied.
+    expect(themeProvider.birthMonth, 5);
+    expect(themeProvider.currentMonthColor.monthName, 'May');
+  });
 }

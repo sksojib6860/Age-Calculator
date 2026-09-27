@@ -182,7 +182,7 @@ class DashboardScreen extends StatelessWidget {
                       ),
                     ),
                     InkWell(
-                      onTap: () => viewModel.setDob(DateTime(1998, 5, 15)),
+                      onTap: () => viewModel.setDob(DateTime(2002, 10, 15)),
                       child: const Icon(Icons.close_rounded, size: 18),
                     ),
                   ],

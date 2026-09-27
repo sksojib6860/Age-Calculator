@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+
 import '../constants/app_colors.dart';
 import '../constants/app_dimensions.dart';
 import '../constants/app_text_styles.dart';
@@ -36,9 +37,9 @@ class CustomDatePickerField extends StatelessWidget {
         return Theme(
           data: Theme.of(context).copyWith(
             colorScheme: Theme.of(context).colorScheme.copyWith(
-                  primary: monthColor.primary,
-                  onPrimary: Colors.white,
-                ),
+              primary: monthColor.primary,
+              onPrimary: Colors.white,
+            ),
           ),
           child: child!,
         );
@@ -54,7 +55,6 @@ class CustomDatePickerField extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final formattedDate = DateFormat.yMMMMd().format(selectedDate);
-
     return GlassCard(
       onTap: () => _pickDate(context),
       padding: const EdgeInsets.symmetric(

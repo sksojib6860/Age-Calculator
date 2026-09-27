@@ -5,6 +5,7 @@ import '../../core/constants/app_dimensions.dart';
 import '../../core/localization/app_localizations.dart';
 import '../../core/theme/theme_provider.dart';
 import '../../core/widgets/glass_card.dart';
+import 'dashboard/view_models/dashboard_view_model.dart';
 import 'dashboard/views/dashboard_screen.dart';
 import 'date_difference/views/date_difference_view.dart';
 import 'family_friends/views/family_friends_view.dart';
@@ -20,6 +21,21 @@ class HomeShellScreen extends StatefulWidget {
 
 class _HomeShellScreenState extends State<HomeShellScreen> {
   int _currentIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    // Sync the dashboard's birth month into ThemeProvider AFTER the first
+    // frame. Doing this directly in build() would call notifyListeners()
+    // while the framework is still building and throw:
+    // "setState() or markNeedsBuild() called during build."
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      context
+          .read<DashboardViewModel>()
+          .updateThemeProvider(context.read<ThemeProvider>());
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
