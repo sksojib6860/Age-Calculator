@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:age_calculator/core/constants/app_dimensions.dart';
 import 'package:age_calculator/core/localization/app_localizations.dart';
 import 'package:age_calculator/core/localization/locale_provider.dart';
@@ -8,6 +6,9 @@ import 'package:age_calculator/core/widgets/custom_date_picker_field.dart';
 import 'package:age_calculator/core/widgets/glass_card.dart';
 import 'package:age_calculator/core/widgets/responsive_wrapper.dart';
 import 'package:age_calculator/ui/features/dashboard/view_models/dashboard_view_model.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
 import 'widgets/age_summary_card.dart';
 import 'widgets/birthday_countdown_card.dart';
 import 'widgets/live_ticker_card.dart';
@@ -278,7 +279,6 @@ class DashboardScreen extends StatelessWidget {
                 monthColor: monthColor,
               ),
               const SizedBox(height: 16),
-
               // Life Milestones Infographics (Heartbeats, Breaths, Sleep, Zodiacs)
               if (milestones != null) ...[
                 MilestonesCard(milestones: milestones, monthColor: monthColor),

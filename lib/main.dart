@@ -16,10 +16,10 @@ import 'domain/use_cases/calculate_age_use_case.dart';
 import 'domain/use_cases/calculate_date_diff_use_case.dart';
 import 'domain/use_cases/calculate_milestones_use_case.dart';
 import 'domain/use_cases/profile_use_cases.dart';
+import 'ui/splash_screen.dart';
 import 'ui/features/dashboard/view_models/dashboard_view_model.dart';
 import 'ui/features/date_difference/view_models/date_diff_view_model.dart';
 import 'ui/features/family_friends/view_models/family_friends_view_model.dart';
-import 'ui/features/home_shell_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -105,7 +105,7 @@ class AgeCalculatorApp extends StatelessWidget {
       themeMode: themeProvider.themeMode,
       theme: AppTheme.lightTheme(accentColor: currentMonthColor.primary),
       darkTheme: AppTheme.darkTheme(accentColor: currentMonthColor.primary),
-      home: const HomeShellScreen(),
+      home: const SplashScreen(),
     );
   }
 }
